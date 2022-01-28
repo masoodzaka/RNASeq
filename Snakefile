@@ -37,7 +37,7 @@ if config["featureCounts"]:
 if config["HTSeqCounts"]:
     ALL.extend(HTSEQCOUNTS)
 
-ALL.extend(SALMONQUANTS)
+#ALL.extend(SALMONQUANTS)
 
 ALL.extend(ARRIBA)
 
@@ -325,7 +325,7 @@ rule SortedBAM:
 
     conda:"ENVS/arriba.yaml"
 
-    message:
+    message: "Running Samtools Sort for {input} using {threads} threads and saving as {output}"
 
     shell:""" samtools \
     sort \
@@ -336,7 +336,7 @@ rule SortedBAM:
     {input.BAM} 2> {log}
     """
 
-    rule SortedBAMIndex:
+rule SortedBAMIndex:
     input:
         BAM=("SortedBAM/{sample}.sorted.bam"),
 
@@ -354,14 +354,14 @@ rule SortedBAM:
 
     conda:"ENVS/arriba.yaml"
 
-    message:
+    message: "Running Samtools Index for {input} using {threads} threads and saving as {output}"
 
     shell:""" samtools \
     index \
     {input.BAM} 2> {log}
     """
 
-    rule CreateBigWig:
+rule CreateBigWig:
     input:
         BAM=("SortedBAM/{sample}.sorted.bam"),
         BAI=("SortedBAM/{sample}.sorted.bam.bai"),
@@ -380,7 +380,7 @@ rule SortedBAM:
 
     conda:"ENVS/deeptools.yaml"
 
-    message:
+    message: "Running Deeptools bamCoverage for {input} using {threads} threads and saving as {output}"
 
     shell:""" bamCoverage \
     -b {input.BAM} \
