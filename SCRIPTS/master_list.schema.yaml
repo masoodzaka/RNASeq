@@ -1,0 +1,21 @@
+$schema: "http://json-schema.org/draft-06/schema#"
+description: row of the samples master_list.txt along with the location for fastq files
+type: object
+properties:
+  runID:
+    type: string
+    description: run id of master_list
+  sample:
+    type: string
+    description: sample name of sample
+  fastq1:
+    type: string
+    description: path to FASTQ file 1
+  fastq2:
+    type: string
+    description: path to second FASTQ file 2 (leave empty in case of single-end)
+required:
+  - runID
+  - sample
+  - fastq1
+  - fastq2
