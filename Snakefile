@@ -15,6 +15,11 @@ FEATURECOUNTS= expand("featureCounts/{sample}_featureCounts.txt", sample=SAMPLES
 HTSEQCOUNTS= expand("HTSeqCounts/{sample}_htseq.counts", sample=SAMPLES)
 SALMONQUANTS= expand("SALMON/{sample}/quant.sf", sample=SAMPLES)
 ARRIBA= expand("ARRIBA/{sample}.tsv", sample=SAMPLES)
+SORTEDBAM=expand("SortedBAM/{sample}.sorted.bam", sample=SAMPLES)
+SORTEDBAMINDEX=expand("SortedBAM/{sample}.sorted.bam.bai",sample=SAMPLES)
+BIGWIG=expand("BIGWIG/{sample}.bw", sample=SAMPLES)
+
+
 
 # extend all the rules using python function 
 ALL = []
@@ -32,7 +37,15 @@ if config["featureCounts"]:
 if config["HTSeqCounts"]:
     ALL.extend(HTSEQCOUNTS)
 
+ALL.extend(SALMONQUANTS)
+
 ALL.extend(ARRIBA)
+
+ALL.extend(SORTEDBAM)
+
+ALL.extend(SORTEDBAMINDEX)
+
+ALL.extend(BIGWIG)
 
 ##
 
@@ -294,3 +307,87 @@ rule Arriba:
     -o {output.FUSIONS} \
     -O {output.DISCARDED} 2> {log}
 """
+rule SortedBAM:
+    input:
+        BAM=("STAR/{sample}Aligned.out.bam"),
+
+    output:
+        BAM=("SortedBAM/{sample}.sorted.bam"),
+
+    params:
+        MEM="2G",
+
+    log: "LOGS/SortedBAM/{sample}.log"
+
+    benchmark: "LOGS/SortedBAM/{sample}.tsv"
+
+    threads: 2
+
+    conda:"ENVS/arriba.yaml"
+
+    message:
+
+    shell:""" samtools \
+    sort \
+    -m {params.MEM} \
+    -@ 5 \
+    -T {output.BAM} \
+    -o {output.BAM} \
+    {input.BAM} 2> {log}
+    """
+
+    rule SortedBAMIndex:
+    input:
+        BAM=("SortedBAM/{sample}.sorted.bam"),
+
+    output:
+        BAI=("SortedBAM/{sample}.sorted.bam.bai")
+
+    params:
+        MEM="2G",
+
+    log: "LOGS/SortedBAM/{sample}.index.log"
+
+    benchmark: "LOGS/SortedBAM/{sample}.index.tsv"
+
+    threads: 2
+
+    conda:"ENVS/arriba.yaml"
+
+    message:
+
+    shell:""" samtools \
+    index \
+    {input.BAM} 2> {log}
+    """
+
+    rule CreateBigWig:
+    input:
+        BAM=("SortedBAM/{sample}.sorted.bam"),
+        BAI=("SortedBAM/{sample}.sorted.bam.bai"),
+
+    output:
+        BW=("BIGWIG/{sample}.bw")
+
+    params:
+        BINSIZE=20,
+
+    log: "LOGS/BIGWIG/{sample}.log"
+
+    benchmark: "LOGS/BIGWIG/{sample}.tsv"
+
+    threads: 2
+
+    conda:"ENVS/deeptools.yaml"
+
+    message:
+
+    shell:""" bamCoverage \
+    -b {input.BAM} \
+    -p {threads} \
+    -bs {params.BINSIZE} \
+    --smoothLength 60 \
+    --skipNonCoveredRegions \
+    --normalizeUsing RPKM \
+    -o {output.BW} 2> {log}
+    """
