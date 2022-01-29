@@ -67,7 +67,9 @@ rule Create_Star_Index:
    
     benchmark:"LOGS/STAR/star_index.tsv"
     
-    threads: 4
+    threads: config["STAR_THREADS"]
+
+    priority: 5
     
     conda: "ENVS/star.yaml"
     
@@ -105,6 +107,8 @@ rule Star_Aligner:
     threads: config["STAR_THREADS"]
 
     conda: "ENVS/star.yaml"
+
+    priority: 5
 
     message:" Running STAR aligner for {input} using {threads} threads and saving as {output}"
 
@@ -161,7 +165,7 @@ rule featureCounts:
 
     benchmark:"LOGS/featureCounts/{sample}.tsv"
 
-    threads: 2
+    threads: config["FC_THREADS"],
 
     conda: "ENVS/subread.yaml"
 
@@ -192,7 +196,7 @@ rule HTSeqCounts:
 
     benchmark:"LOGS/HTSeqCounts/{sample}.tsv"
 
-    threads: 2
+    threads: config["HTSEQ_THREADS"]
 
     conda: "ENVS/htseq.yaml"
 
@@ -224,9 +228,11 @@ rule Create_Salmon_Index:
 
     benchmark:"LOGS/SALMON/salmon_index.tsv"
 
-    threads: 2
+    threads: config["SALMON_THREADS"],
 
     conda: "ENVS/salmon.yaml"
+
+    priority: 1
 
     message:" Creating SALMON index for {input} and saving as {output}"
 
@@ -257,9 +263,11 @@ rule Salmon_Quants:
 
     benchmark:"LOGS/SALMON/{sample}.tsv"
 
-    threads: 2
+    threads: config["SALMON_THREADS"],
 
     conda: "ENVS/salmon.yaml"
+
+    priority: 1
 
     message:" Running Salmon Quant for {input} using {threads} threads and saving as {output}"
 
@@ -291,7 +299,7 @@ rule Arriba:
 
     benchmark:"LOGS/ARRIBA/{sample}.tsv"
 
-    threads: 2
+    threads: config["ARRIBA_THREADS"],
 
     conda: "ENVS/arriba.yaml"
 
@@ -323,7 +331,7 @@ rule SortedBAM:
 
     threads: 2
 
-    conda:"ENVS/arriba.yaml"
+    conda:"ENVS/samtools.yaml"
 
     message: "Running Samtools Sort for {input} using {threads} threads and saving as {output}"
 
@@ -352,7 +360,7 @@ rule SortedBAMIndex:
 
     threads: 2
 
-    conda:"ENVS/arriba.yaml"
+    conda:"ENVS/samtools.yaml"
 
     message: "Running Samtools Index for {input} using {threads} threads and saving as {output}"
 
@@ -376,7 +384,7 @@ rule CreateBigWig:
 
     benchmark: "LOGS/BIGWIG/{sample}.tsv"
 
-    threads: 2
+    threads: config["DT_THREADS"],
 
     conda:"ENVS/deeptools.yaml"
 
