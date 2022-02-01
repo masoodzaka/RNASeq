@@ -16,7 +16,7 @@ MASTER_LIST: "/home/RNASeq/master_list.txt"
 
 # if true, create start index for aligners
 
-STAR_INDEX: false
+STAR_INDEX: falsegit
 SALMON_INDEX: true
 
 # Chose program for rna counts
@@ -51,7 +51,7 @@ GTF: "/home/GATK_Bundle/b37/gencode.v39lift37.annotation.gtf"
 #
 #########################################################################################################################
 # Change the number of threads for Star aligner according to the available resources
-STAR_THREADS: 5
+STAR_THREADS: 2
 
 ########################################################################################################################
 #

@@ -95,8 +95,8 @@ rule Star_Aligner:
         TAB=("STAR/{sample}ReadsPerGene.out.tab")
 
     params:
-        R1= lambda wildcards, input: input.R1 if len(input) ==2 else (str(",".join(input.R1))) ,
-        R2= lambda wildcards, input: input.R2 if len(input) ==2  else (str(",".join(input.R1))),
+        R1= lambda wildcards, input: input.R1 if len(input.R1) > 5 else (str(",".join(input.R1))) ,
+        R2= lambda wildcards, input: input.R2 if len(input.R2) > 5  else (str(",".join(input.R1))),
         INDEX="INDEX/STAR_INDEX",
         PREFIX="STAR/{sample}"
 
@@ -255,8 +255,8 @@ rule Salmon_Quants:
         LIB=("SALMON/{sample}/lib_format_counts.json")
 
     params:
-        R1=lambda wildcards, input: input.R1 if len(input) ==2 else (str(" ".join(input.R1))),
-        R2=lambda wildcards, input: input.R1 if len(input) ==2 else (str(" ".join(input.R1))),
+        R1= lambda wildcards, input: input.R1 if len(input.R1) > 5 else (str(",".join(input.R1))) ,
+        R2= lambda wildcards, input: input.R2 if len(input.R2) > 5  else (str(",".join(input.R1))),
         INDEX="INDEX/SALMON_INDEX",
 
     log: "LOGS/SALMON/{sample}.log"
