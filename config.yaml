@@ -5,18 +5,18 @@
 #########################################################################################################################
 # Having base dir will allow to move up and down to the directory or scripts, also able to used different settings of
 # the pipeline.
-BASE_DIR: "/home/RNASeq"
+BASE_DIR: "/nobackup/mzaka/RNASeq"
 
 # temp dir for hpc only
-#TMPDIR: "path to temp dir"
+TMPDIR: "/nobackup/scratch" 
 
 # List of samples containing runID, readgroupd, path to Fastq1 and Fastq2
 # List of samples containing normals and tumour samples
-MASTER_LIST: "/home/RNASeq/master_list.txt"
+MASTER_LIST: "/nobackup/mzaka/RNASeq/master_list.txt"
 
 # if true, create start index for aligners
 
-STAR_INDEX: false
+STAR_INDEX: true
 SALMON_INDEX: true
 
 # Chose program for rna counts
@@ -34,7 +34,7 @@ HTSeqCounts: true
 
 # The GTF and primary fasta file was downloaded from https://www.gencodegenes.org/human/release_39lift37.html
 # Nucleotide sequences of all transcripts on the reference chromosomes
-REF: "/home/GATK_Bundle/b37/GRCh37.primary_assembly.genome.fa"
+REF: "/nobackup/common/databases/GATK_Bundle/b37/GRCh37.primary_assembly.genome.fa"
 
 # It contains the comprehensive gene annotation originally created on the GRCh38 reference chromosomes, mapped to the GRCh37 primary 
 # assembly with gencode-backmap. This is the main annotation file for most users
@@ -42,7 +42,7 @@ REF: "/home/GATK_Bundle/b37/GRCh37.primary_assembly.genome.fa"
 # Also note that some manually annotated ('HAVANA') genes did not map properly to GRCh37. 
 # Their annotation was copied from GENCODE 19 if available, or they are completely absent otherwise.
 
-GTF: "/home/GATK_Bundle/b37/gencode.v39lift37.annotation.gtf"
+GTF: "/nobackup/common/databases/GATK_Bundle/b37/gencode.v39lift37.annotation.gtf"
 
 
 ########################################################################################################################
@@ -51,7 +51,7 @@ GTF: "/home/GATK_Bundle/b37/gencode.v39lift37.annotation.gtf"
 #
 #########################################################################################################################
 # Change the number of threads for Star aligner according to the available resources
-STAR_THREADS: 5
+STAR_THREADS: 16
 
 ########################################################################################################################
 #
@@ -60,18 +60,18 @@ STAR_THREADS: 5
 #########################################################################################################################
 
 # For Salmon decoy aware index, follow this method https://combine-lab.github.io/alevin-tutorial/2019/selective-alignment/
-SALMON_GTF: "/home/GATK_Bundle/b37/gentrome.fa.gz"
-DECOYS: "/home/GATK_Bundle/b37/decoys.txt"
-SALMON_THREADS: 5
+SALMON_GTF: "/nobackup/common/databases/GATK_Bundle/b37/gentrome.fa.gz"
+DECOYS: "/nobackup/common/databases/GATK_Bundle/b37/decoys.txt"
+SALMON_THREADS: 16
 
 ########################################################################################################################
 #
 #                                       ARRIBA fusion catcher settings
 #
 #########################################################################################################################
-BLACKLIST: "/home/GATK_Bundle/b37/arriba/blacklist_hg19_hs37d5_GRCh37_v2.2.1.tsv"
-KNOWNFUSION: "/home/GATK_Bundle/b37/arriba/known_fusions_hg19_hs37d5_GRCh37_v2.2.1.tsv"
-ARRIBA_THREADS: 5
+BLACKLIST: "/nobackup/common/databases/GATK_Bundle/b37/arriba/blacklist_hg19_hs37d5_GRCh37_v2.2.1.tsv"
+KNOWNFUSION: "/nobackup/common/databases/GATK_Bundle/b37/arriba/known_fusions_hg19_hs37d5_GRCh37_v2.2.1.tsv"
+ARRIBA_THREADS: 16
 
 ########################################################################################################################
 #

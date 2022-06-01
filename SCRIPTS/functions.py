@@ -23,20 +23,43 @@ wildcard_constraints:
 
 
 
-# functions for start inputs rule
+# # functions for start inputs rule
 
 def star_input(wildcards):
-	""" function provides the rowwise fastqs from the master list in the form a python dictionary"""
-	fastqs = MASTER_LIST.loc[(wildcards.sample), ["fastq1", "fastq2"]].dropna()
-	if len(fastqs.columns) == 2:
-		return {"R1": [f for f in fastqs.fastq1], "R2": [f for f in fastqs.fastq2]}
-	else:
-		return {"R1": [f for f in fastqs.fastq1]}
+	fastqs=MASTER_LIST.loc[(wildcards.sample),["fastq1","fastq2"]].dropna()
+	for f in [fastqs.fastq1]:
+		if len(fastqs.fastq1) < 5:
+			return {"R1": [f for f in fastqs.fastq1], "R2": [f for f in fastqs.fastq2]}
+		else:
+			return {"R1": fastqs.fastq1, "R2": fastqs.fastq1}
+
 
 def salmon_input(wildcards):
-	""" function provides the rowwise fastqs from the master list in the form a python dictionary"""
-	fastqs = MASTER_LIST.loc[(wildcards.sample), ["fastq1", "fastq2"]].dropna()
-	if len(fastqs.columns) == 2:
-		return {"R1": [f for f in fastqs.fastq1], "R2": [f for f in fastqs.fastq2]}
-	else:
-		return {"R1": [f for f in fastqs.fastq1]}
+	fastqs=MASTER_LIST.loc[(wildcards.sample),["fastq1","fastq2"]].dropna()
+	for f in [fastqs.fastq1]:
+		if len(fastqs.fastq1) < 5:
+			return {"R1": [f for f in fastqs.fastq1], "R2": [f for f in fastqs.fastq2]}
+		else:
+			return {"R1": fastqs.fastq1, "R2": fastqs.fastq1}
+
+
+
+# def star_input(wildcards):
+# 	""" function provides the rowwise fastqs from the master list in the form a python dictionary"""
+# 	fastqs = MASTER_LIST.loc[(wildcards.sample), ["fastq1", "fastq2"]].dropna()
+# 	if len(fastqs)> 2:
+# 		return {"R1": [f for f in fastqs.fastq1], "R2": [f for f in fastqs.fastq2]}
+# 	elif len(fastqs)==2:
+# 		return {"R1": fastqs.fastq1, "R2": fastqs.fastq2}
+# 	else:
+# 		return {"R1": [f for f in fastqs.fastq1]}
+
+# def salmon_input(wildcards):
+# 	""" function provides the rowwise fastqs from the master list in the form a python dictionary"""
+# 	fastqs = MASTER_LIST.loc[(wildcards.sample), ["fastq1", "fastq2"]].dropna()
+# 	if len(fastqs) > 2:
+# 		return {"R1": [f for f in fastqs.fastq1], "R2": [f for f in fastqs.fastq2]}
+# 	elif len(fastqs)==2:
+# 		return {"R1": fastqs.fastq1, "R2": fastqs.fastq2}
+# 	else:
+# 		return {"R1": fastqs.fastq1}

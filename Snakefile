@@ -28,14 +28,14 @@ if config["STAR_INDEX"]:
     ALL.extend(STAR_INDEX)
 ALL.extend(STAR_BAMS)
 
-if config["SALMON_INDEX"]:
-    ALL.extend(SALMON_INDEX)
+#if config["SALMON_INDEX"]:
+   # ALL.extend(SALMON_INDEX)
 
-if config["featureCounts"]:
-    ALL.extend(FEATURECOUNTS)
+#if config["featureCounts"]:
+    #ALL.extend(FEATURECOUNTS)
 
-if config["HTSeqCounts"]:
-    ALL.extend(HTSEQCOUNTS)
+#if config["HTSeqCounts"]:
+    #ALL.extend(HTSEQCOUNTS)
 
 #ALL.extend(SALMONQUANTS)
 
@@ -69,7 +69,7 @@ rule Create_Star_Index:
     
     threads: config["STAR_THREADS"]
 
-    priority: 5
+    priority: 100
     
     conda: "ENVS/star.yaml"
     
@@ -95,10 +95,10 @@ rule Star_Aligner:
         TAB=("STAR/{sample}ReadsPerGene.out.tab")
 
     params:
-        R1=lambda wildcards, input: str(",".join(input.R1)),
-        R2=lambda wildcards, input: str(",".join(input.R2)),
+        R1= lambda wildcards, input: input.R1 if len(input.R1) > 5 else (str(",".join(input.R1))) ,
+        R2= lambda wildcards, input: input.R2 if len(input.R2) > 5  else (str(",".join(input.R1))),
         INDEX="INDEX/STAR_INDEX",
-        PREFIX="STAR/{sample}"
+        PREFIX="STAR/{sample}",
 
     log: "LOGS/STAR/{sample}.log"
 
@@ -109,6 +109,9 @@ rule Star_Aligner:
     conda: "ENVS/star.yaml"
 
     priority: 5
+    
+    resources:
+        mem_mb=2048,
 
     message:" Running STAR aligner for {input} using {threads} threads and saving as {output}"
 
@@ -232,7 +235,7 @@ rule Create_Salmon_Index:
 
     conda: "ENVS/salmon.yaml"
 
-    priority: 1
+    priority: 100
 
     message:" Creating SALMON index for {input} and saving as {output}"
 
@@ -255,8 +258,8 @@ rule Salmon_Quants:
         LIB=("SALMON/{sample}/lib_format_counts.json")
 
     params:
-        R1=lambda wildcards, input: str(" ".join(input.R1)),
-        R2=lambda wildcards, input: str(" ".join(input.R2)),
+        R1= lambda wildcards, input: input.R1 if len(input.R1) > 5 else (str(",".join(input.R1))) ,
+        R2= lambda wildcards, input: input.R2 if len(input.R2) > 5  else (str(",".join(input.R1))),
         INDEX="INDEX/SALMON_INDEX",
 
     log: "LOGS/SALMON/{sample}.log"
@@ -288,6 +291,8 @@ rule Arriba:
     output:
         FUSIONS=("ARRIBA/{sample}.tsv"),
         DISCARDED=("ARRIBA/{sample}.discarded.tsv")
+    resources:
+        mem_mb=2048,
 
     params:
         GTF=config["GTF"],
