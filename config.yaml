@@ -8,7 +8,7 @@
 BASE_DIR: "/home/RNASeq"
 
 # temp dir for hpc only
-#TMPDIR: "path to temp dir"
+TMPDIR: "/home/TMPDIR"
 
 # List of samples containing runID, readgroupd, path to Fastq1 and Fastq2
 # List of samples containing normals and tumour samples
@@ -16,12 +16,17 @@ MASTER_LIST: "/home/RNASeq/master_list.txt"
 
 # if true, create start index for aligners
 
-STAR_INDEX: falsegit
+STAR_INDEX: false
 SALMON_INDEX: true
 
 # Chose program for rna counts
 featureCounts: true
 HTSeqCounts: true
+
+# Adapter for cutadapt or just the quality trimming m20 q20
+CUTADAPT:
+  trimming: false
+  removeadapter: false
 
 ########################################################################################################################
 #
@@ -44,6 +49,14 @@ REF: "/home/GATK_Bundle/b37/GRCh37.primary_assembly.genome.fa"
 
 GTF: "/home/GATK_Bundle/b37/gencode.v39lift37.annotation.gtf"
 
+########################################################################################################################
+#
+#                                       Cutadapt settings and parameters
+#
+#########################################################################################################################
+# Change the number of threads for Star aligner according to the available resources
+cutadapt_pe: "-a CCTTAGGCAACCTGGTGGTCCCCCGCTCCCGGGAGGTCACCATATTGATG -g GCTCCGTTTCCGACCTGGGCCGGTTCACCCCTCCTTAGGCAACCTGGTGG -A CCTTAGGCAACCTGGTGGTCCCCCGCTCCCGGGAGGTCACCATATTGATG -G GCTCCGTTTCCGACCTGGGCCGGTTCACCCCTCCTTAGGCAACCTGGTGG"
+extra: "--minimum-length 20 -q 20"
 
 ########################################################################################################################
 #
@@ -51,7 +64,7 @@ GTF: "/home/GATK_Bundle/b37/gencode.v39lift37.annotation.gtf"
 #
 #########################################################################################################################
 # Change the number of threads for Star aligner according to the available resources
-STAR_THREADS: 2
+STAR_THREADS: 8
 
 ########################################################################################################################
 #
@@ -62,7 +75,7 @@ STAR_THREADS: 2
 # For Salmon decoy aware index, follow this method https://combine-lab.github.io/alevin-tutorial/2019/selective-alignment/
 SALMON_GTF: "/home/GATK_Bundle/b37/gentrome.fa.gz"
 DECOYS: "/home/GATK_Bundle/b37/decoys.txt"
-SALMON_THREADS: 5
+SALMON_THREADS: 8
 
 ########################################################################################################################
 #
