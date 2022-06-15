@@ -1,1 +1,1 @@
-# RNASeq
+# Snakemake_RNASeq
