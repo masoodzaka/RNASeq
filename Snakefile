@@ -13,7 +13,7 @@ SALMON_INDEX = ["INDEX/SALMON_INDEX"]
 STAR_BAMS= expand("STAR/{sample}Aligned.out.bam", sample=SAMPLES)
 FEATURECOUNTS= expand("featureCounts/{sample}_featureCounts.txt", sample=SAMPLES)
 HTSEQCOUNTS= expand("HTSeqCounts/{sample}_htseq.counts", sample=SAMPLES)
-SALMONQUANTS= expand("SALMON/{sample}/quant.sf", sample=SAMPLES)
+SALMONQUANTS= expand("SALMON/{sample}_quant/quant.sf", sample=SAMPLES)
 ARRIBA= expand("ARRIBA/{sample}.tsv", sample=SAMPLES)
 SORTEDBAM=expand("SortedBAM/{sample}.sorted.bam", sample=SAMPLES)
 SORTEDBAMINDEX=expand("SortedBAM/{sample}.sorted.bam.bai",sample=SAMPLES)
@@ -28,16 +28,16 @@ if config["STAR_INDEX"]:
     ALL.extend(STAR_INDEX)
 ALL.extend(STAR_BAMS)
 
-#if config["SALMON_INDEX"]:
-   # ALL.extend(SALMON_INDEX)
+if config["SALMON_INDEX"]:
+    ALL.extend(SALMON_INDEX)
 
-#if config["featureCounts"]:
-    #ALL.extend(FEATURECOUNTS)
+if config["featureCounts"]:
+    ALL.extend(FEATURECOUNTS)
 
-#if config["HTSeqCounts"]:
-    #ALL.extend(HTSEQCOUNTS)
+if config["HTSeqCounts"]:
+    ALL.extend(HTSEQCOUNTS)
 
-#ALL.extend(SALMONQUANTS)
+ALL.extend(SALMONQUANTS)
 
 ALL.extend(ARRIBA)
 
@@ -95,8 +95,8 @@ rule Star_Aligner:
         TAB=("STAR/{sample}ReadsPerGene.out.tab")
 
     params:
-        R1= lambda wildcards, input: input.R1 if len(input.R1) > 5 else (str(",".join(input.R1))) ,
-        R2= lambda wildcards, input: input.R2 if len(input.R2) > 5  else (str(",".join(input.R1))),
+        R1= lambda wildcards, input: (str(",".join(input.R1))),
+        R2= lambda wildcards, input: (str(",".join(input.R2))),
         INDEX="INDEX/STAR_INDEX",
         PREFIX="STAR/{sample}",
 
@@ -254,12 +254,12 @@ rule Salmon_Quants:
         unpack(salmon_input)
 
     output:
-        QUANT=("SALMON/{sample}/quant.sf"),
-        LIB=("SALMON/{sample}/lib_format_counts.json")
+        QUANT=("SALMON/{sample}_quant/quant.sf"),
+        LIB=("SALMON/{sample}_quant/lib_format_counts.json")
 
     params:
-        R1= lambda wildcards, input: input.R1 if len(input.R1) > 5 else (str(",".join(input.R1))) ,
-        R2= lambda wildcards, input: input.R2 if len(input.R2) > 5  else (str(",".join(input.R1))),
+        R1= lambda wildcards, input: (str(" ".join(input.R1))),
+        R2= lambda wildcards, input: (str(" ".join(input.R2))),
         INDEX="INDEX/SALMON_INDEX",
 
     log: "LOGS/SALMON/{sample}.log"
@@ -274,14 +274,16 @@ rule Salmon_Quants:
 
     message:" Running Salmon Quant for {input} using {threads} threads and saving as {output}"
 
-    shell:""" salmon quant \
+    shell:""" 
+     OUTDIR=$(dirname {output.QUANT})
+     salmon quant \
     -i {params.INDEX} \
     -l A \
     -1 {params.R1} \
     -2 {params.R2} \
     -p {threads} \
     --validateMappings \
-    -o {output.QAUNT} 2> {log}
+    -o $OUTDIR 2> {log}
 """
 
 rule Arriba:
@@ -384,7 +386,10 @@ rule CreateBigWig:
 
     params:
         BINSIZE=20,
-
+    
+    resources:
+        mem_mb=2048,
+   
     log: "LOGS/BIGWIG/{sample}.log"
 
     benchmark: "LOGS/BIGWIG/{sample}.tsv"
