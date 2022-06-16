@@ -23,6 +23,11 @@ SALMON_INDEX: true
 featureCounts: true
 HTSeqCounts: true
 
+# Adapter for cutadapt or just the quality trimming m20 q20
+CUTADAPT:
+  trimming: false
+  removeadapter: false
+
 ########################################################################################################################
 #
 #                                       Genome reference files
@@ -44,6 +49,14 @@ REF: "/nobackup/common/databases/GATK_Bundle/b37/GRCh37.primary_assembly.genome.
 
 GTF: "/nobackup/common/databases/GATK_Bundle/b37/gencode.v39lift37.annotation.gtf"
 
+########################################################################################################################
+#
+#                                       Cutadapt settings and parameters
+#
+#########################################################################################################################
+# Change the number of threads for Star aligner according to the available resources
+cutadapt_pe: "-a CCTTAGGCAACCTGGTGGTCCCCCGCTCCCGGGAGGTCACCATATTGATG -g GCTCCGTTTCCGACCTGGGCCGGTTCACCCCTCCTTAGGCAACCTGGTGG -A CCTTAGGCAACCTGGTGGTCCCCCGCTCCCGGGAGGTCACCATATTGATG -G GCTCCGTTTCCGACCTGGGCCGGTTCACCCCTCCTTAGGCAACCTGGTGG"
+extra: "--minimum-length 20 -q 20"
 
 ########################################################################################################################
 #
@@ -62,7 +75,7 @@ STAR_THREADS: 16
 # For Salmon decoy aware index, follow this method https://combine-lab.github.io/alevin-tutorial/2019/selective-alignment/
 SALMON_GTF: "/nobackup/common/databases/GATK_Bundle/b37/gentrome.fa.gz"
 DECOYS: "/nobackup/common/databases/GATK_Bundle/b37/decoys.txt"
-SALMON_THREADS: 16
+SALMON_THREADS: 8
 
 ########################################################################################################################
 #
@@ -71,7 +84,7 @@ SALMON_THREADS: 16
 #########################################################################################################################
 BLACKLIST: "/nobackup/common/databases/GATK_Bundle/b37/arriba/blacklist_hg19_hs37d5_GRCh37_v2.2.1.tsv"
 KNOWNFUSION: "/nobackup/common/databases/GATK_Bundle/b37/arriba/known_fusions_hg19_hs37d5_GRCh37_v2.2.1.tsv"
-ARRIBA_THREADS: 16
+ARRIBA_THREADS: 8
 
 ########################################################################################################################
 #
