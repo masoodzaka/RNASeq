@@ -8,8 +8,8 @@ configfile: "config.yaml"
 # include functions.py modules
 include: "SCRIPTS/functions.py"
 
-FASTQC=expand(["QC/FASTQC/{sample}_{lane}_R1_fastqc.html","QC/FASTQC/{sample}_{lane}_R2_fastqc.html"], zip,sample=SAMPLES, lane=LANES)
-CUTADAPT=expand(["FASTQ/TRIMMED/{sample}_{lane}_R1.fastq.gz","FASTQ/TRIMMED/{sample}_{lane}_R2.fastq.gz"], zip,sample=SAMPLES, lane=LANES)
+FASTQC=expand(["QC/FASTQC/{sample}_{runID}_R1_fastqc.html","QC/FASTQC/{sample}_{runID}_R2_fastqc.html"], zip,sample=SAMPLES, runID=RUNIDS)
+CUTADAPT=expand(["FASTQ/TRIMMED/{sample}_{runID}_R1.fastq.gz","FASTQ/TRIMMED/{sample}_{runID}_R2.fastq.gz"], zip,sample=SAMPLES, runID=RUNIDS)
 MULTIQC=["QC/multiqc_report.html"]
 STAR_INDEX = ["INDEX/STAR_INDEX"]
 SALMON_INDEX = ["INDEX/SALMON_INDEX"]
@@ -27,37 +27,37 @@ BIGWIG=expand("BIGWIG/{sample}.bw", sample=SAMPLES)
 # extend all the rules using python function 
 ALL = []
 
-ALL.extend(FASTQC)
+# ALL.extend(FASTQC)
 
-if config["CUTADAPT"]["trimming"]:
-    ALL.extend(CUTADAPT)
+# if config["CUTADAPT"]["trimming"]:
+#     ALL.extend(CUTADAPT)
 
-ALL.extend(MULTIQC)
+# ALL.extend(MULTIQC)
 
-if config["STAR_INDEX"]:
-    ALL.extend(STAR_INDEX)
-ALL.extend(STAR_BAMS)
+# if config["STAR_INDEX"]:
+#     ALL.extend(STAR_INDEX)
+# ALL.extend(STAR_BAMS)
 
-if config["SALMON_INDEX"]:
-    ALL.extend(SALMON_INDEX)
+# if config["SALMON_INDEX"]:
+#     ALL.extend(SALMON_INDEX)
 
-if config["featureCounts"]:
-   ALL.extend(FEATURECOUNTS)
+# if config["featureCounts"]:
+#    ALL.extend(FEATURECOUNTS)
 
-if config["HTSeqCounts"]:
-   ALL.extend(HTSEQCOUNTS)
+# if config["HTSeqCounts"]:
+#    ALL.extend(HTSEQCOUNTS)
 
 ALL.extend(SALMONQUANTS)
 
-ALL.extend(ARRIBA)
+# ALL.extend(ARRIBA)
 
-ALL.extend(SORTEDBAM)
+# ALL.extend(SORTEDBAM)
 
-ALL.extend(SORTEDBAMINDEX)
+# ALL.extend(SORTEDBAMINDEX)
 
-ALL.extend(BIGWIG)
+# ALL.extend(BIGWIG)
 
-##
+# ##
 
 rule ALL:
     input:
@@ -67,8 +67,8 @@ rule FastQC:
     input:
         unpack(fastqc_input)
     output:
-        HTML=(["QC/FASTQC/{sample}_{lane}_R1_fastqc.html","QC/FASTQC/{sample}_{lane}_R2_fastqc.html"]),
-        ZIP=(["QC/FASTQC/{sample}_{lane}_R1_fastqc.zip","QC/FASTQC/{sample}_{lane}_R2_fastqc.zip"])
+        HTML=(["QC/FASTQC/{sample}_{runID}_R1_fastqc.html","QC/FASTQC/{sample}_{runID}_R2_fastqc.html"]),
+        ZIP=(["QC/FASTQC/{sample}_{runID}_R1_fastqc.zip","QC/FASTQC/{sample}_{runID}_R2_fastqc.zip"])
 
     threads: 2
 
@@ -80,9 +80,9 @@ rule FastQC:
 
     conda: "ENVS/qc.yaml",
 
-    log: "LOGS/QC/FASTQC/{sample}_{lane}.log"
+    log: "LOGS/QC/FASTQC/{sample}_{runID}.log"
 
-    benchmark: "LOGS/QC/FASTQC/{sample}_{lane}.tsv"
+    benchmark: "LOGS/QC/FASTQC/{sample}_{runID}.tsv"
 
     message: "Running FastQC for {input} using {threads} threads and saving as {output}"
 
@@ -98,9 +98,9 @@ rule Cutadapt_PE:
     input:
         unpack(cutadapt_input)
     output:
-        FASTQ1="FASTQ/TRIMMED/{sample}_{lane}_R1.fastq.gz",
-        FASTQ2="FASTQ/TRIMMED/{sample}_{lane}_R2.fastq.gz",
-        QC="QC/TRIMMED/{sample}_{lane}.paired.qc.txt"
+        FASTQ1="FASTQ/TRIMMED/{sample}_{runID}_R1.fastq.gz",
+        FASTQ2="FASTQ/TRIMMED/{sample}_{runID}_R2.fastq.gz",
+        QC="QC/TRIMMED/{sample}_{runID}.paired.qc.txt"
 
     threads: 4
 
@@ -110,11 +110,11 @@ rule Cutadapt_PE:
 
     conda: "ENVS/trim.yaml",
 
-    log: "LOGS/CUTADAPT/{sample}_{lane}.log"
+    log: "LOGS/CUTADAPT/{sample}_{runID}.log"
 
-    benchmark: "LOGS/CUTADAPT/{sample}_{lane}.tsv"
+    benchmark: "LOGS/CUTADAPT/{sample}_{runID}.tsv"
 
-    message: "Running FastQC for {input} using {threads} threads and saving as {output}"
+    message: "Running Cutadapt for {input} using {threads} threads and saving as {output}"
 
     shell:"""
         cutadapt \
@@ -203,7 +203,7 @@ rule Star_Aligner:
 
     priority: 5
 
-    message:" Running STAR aligner for {input} using {threads} threads and saving as {output}"
+    message:" Running STAR aligner for {input.R1} and {input.R2} using {threads} threads and saving as {output}"
 
     shell:""" STAR --runMode alignReads \
         --runThreadN {threads} \
@@ -362,7 +362,7 @@ rule Salmon_Quants:
 
     priority: 1
 
-    message:" Running Salmon Quant for {input} using {threads} threads and saving as {output}"
+    message:" Running Salmon Quant for {input.R1} and {input.R2} using {threads} threads and saving as {output}"
 
     shell:"""
 
@@ -390,6 +390,9 @@ rule Arriba:
         REF=config["REF"],
         BLACKLIST=config["BLACKLIST"],
         KNOWNFUSION=config["KNOWNFUSION"],
+
+    resources:
+        mem_mb=2048,
 
     log: "LOGS/ARRIBA/{sample}.log"
 
