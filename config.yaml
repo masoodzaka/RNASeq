@@ -20,12 +20,12 @@ STAR_INDEX: false
 SALMON_INDEX: true
 
 # Chose program for rna counts
-featureCounts: true
-HTSeqCounts: true
+featureCounts: false
+HTSeqCounts: false
 
 # Adapter for cutadapt or just the quality trimming m20 q20
 CUTADAPT:
-  trimming: false
+  trimming: true
   removeadapter: false
 
 ########################################################################################################################
@@ -61,7 +61,6 @@ extra: "--minimum-length 20 -q 20"
 ########################################################################################################################
 #
 #                                       STAR Aligner settings and parameters
-#
 #########################################################################################################################
 # Change the number of threads for Star aligner according to the available resources
 STAR_THREADS: 8
